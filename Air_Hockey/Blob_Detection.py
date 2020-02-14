@@ -37,15 +37,28 @@ def image_operations (image):
     hsv_mask = cv2.inRange(hsv, lower_blue, upper_blue)
     res = cv2.bitwise_and(image, image, mask=hsv_mask)
 
+    #different filters to produce a better image
     #kernel = np.ones((15, 15), np.float32) / 255;
     #smoothed = cv2.filter2D(res, -1, kernel)
-
     #clearer = cv2.GaussianBlur(res, (15, 15), 0)
-    median = cv2.medianBlur(res, 15)
+    median = cv2.medianBlur(res, 15)       #best one
 
-    cv2.imshow("median", median)
-    #cv2.imshow("clearer", clearer)
-    #cv2.imshow("smoothed", smoothed)
+    kernel = np.ones((5, 5), np.uint8)
+    #erosion = cv2.erode(mask, kernel, iterations=1)
+    #dilation = cv2.dilate(mask, kernel, iterations=1)
+
+    opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    #closing = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+    #cv2.imshow("opening", opening)
+    #cv2.imshow("median", median)
+
+    #edges and gradients
+    #laplacian = cv2.Laplacian(image, cv2.CV_64F)
+    #sobelx = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+    #sobely = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)
+
+    #edges = cv2.Canny(image, 200, 200)      #Edge detection
     return image
 
 while True:

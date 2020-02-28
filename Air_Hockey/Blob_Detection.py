@@ -5,9 +5,10 @@ import imutils
 import argparse
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-s", "--stream", type=int, default=0, help="stream video from videostream. denote capture #")
-ap.add_argument("-w", "--write", type=str, default="output.avi", help="write video stream to file")
+ap.add_argument("-s", "--stream", type=int, default=0, help="stream video from videostream. denote capture number (default=0)")
+ap.add_argument("-w", "--write", type=str, default="output.avi", help="write video stream to file (default=\"output.avi\")")
 ap.add_argument("-r", "--read", type=str, default="", help="read from existing video file")
+ap.add_argument("-d", "--debug", help="debug by piping extra info into debug.txt")
 
 args = vars(ap.parse_args())
 
@@ -35,26 +36,7 @@ detector = cv2.SimpleBlobDetector_create(blob_params)
 lower_blue = np.array([100, 50, 50])
 upper_blue = np.array([120, 255, 255])
 
-
 def image_operations(image):
-    # hue, saturation, and value
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-    hsv_mask = cv2.inRange(hsv, lower_blue, upper_blue)
-    res = cv2.bitwise_and(image, image, mask=hsv_mask)
-
-    median = cv2.medianBlur(res, 15)
-
-    kernel = np.ones((15, 15), np.float32) / 255;
-    smoothed = cv2.filter2D(median, -1, kernel)
-
-    # cv2.imshow("median", median)
-    # cv2.imshow("smoothed", smoothed)
-
-    return smoothed
-
-
-def different_operations(image):
     blur = cv2.GaussianBlur(image, (11, 11), 0)
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
 
@@ -72,11 +54,11 @@ def detection(original, image):
 
     keypoints = detector.detect(inverse_im)
 
-    print("-----------------------------------")
-    print("num of blobs: ", len(keypoints))
-    for point in keypoints:
-        print(point.pt[0], " ", point.pt[1])
-    print("-----------------------------------")
+    # print("-----------------------------------")
+    # print("num of blobs: ", len(keypoints))
+    # for point in keypoints:
+    #     print(point.pt[0], " ", point.pt[1])
+    # print("-----------------------------------")
 
     im_with_keypoints = cv2.drawKeypoints(original, keypoints, np.array([]),
                                           (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
@@ -85,37 +67,35 @@ def detection(original, image):
 
 while True:
 
-    file = open("debug.txt", "+w")
+    if args.get("debug") != "":
+        file = open("debug.txt", "+w")
+
     success, image = vidcap.read()
     count += 1
     if success:
-        # out.write(image)       #For saving videos for data later
+
+        if args.get("write") != "":
+            out.write(image)       #For saving videos for data later
 
         image = imutils.resize(image, width=600)  # increases FPS
-        # new_image = image_operations(image)
-        new_image = different_operations(image)
+        new_image = image_operations(image)
 
         blobs = detection(image, new_image)
         cv2.imshow("blobs", blobs)
 
-        # file.write("--------------------------------\n")
-        # file.write(str(new_image) + "\n")
-        # file.write("--------------------------------\n")
-
-        # cv2.imshow('image', image)
-        # cv2.imshow('new_image', new_image)
+        # if (args.get("debug") != ""):
+            # file.write("--------------------------------\n")
+            # file.write(str(new_image) + "\n")
+            # file.write("--------------------------------\n")
 
         # cv2.imwrite("frame%d.jpg" % count, image)
-
-        # im = cv2.imread("frame%d.jpg" % count, cv2.IMREAD_GRAYSCALE)
-
-    # if (count % 10 == 0):
-    #    print('Finished with #%d' % count)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         file.close()
         break
 
+if (args.get("write") != ""):
+    out.release()
+
 vidcap.release()
-# out.release()
 cv2.destroyAllWindows()

@@ -91,7 +91,8 @@ while True:
         # cv2.imwrite("frame%d.jpg" % count, image)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        file.close()
+        if (args.get("debug") != ""):
+            file.close()
         break
 
 if (args.get("write") != ""):

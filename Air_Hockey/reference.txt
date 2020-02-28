@@ -1,0 +1,43 @@
+Types of filters:
+
+ - gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+ - ret, mask = cv2.threshold(gray, 115, 255, cv2.THRESH_BINARY)
+
+ - Not really too useful in this case but it's pretty good for clearing up an image
+ - guassian = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 115, 1)
+
+ - kernel = np.ones((15, 15), np.float32) / 255;
+ - smoothed = cv2.filter2D(res, -1, kernel)
+ - clearer = cv2.GaussianBlur(res, (15, 15), 0)
+
+ - erosion = cv2.erode(mask, kernel, iterations=1)
+ - dilation = cv2.dilate(mask, kernel, iterations=1)
+
+ - opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+ - closing = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+ - cv2.imshow("opening", opening)
+
+ - edges and gradients
+ - laplacian = cv2.Laplacian(image, cv2.CV_64F)
+ - sobelx = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+ - sobely = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)
+
+ - edges = cv2.Canny(image, 200, 200)      #Edge detection
+
+# how to explictly calling ROI (region of image)
+# image[0:120, 0:120] = [255, 255, 255]
+
+def draw (image):
+    #image, (x1, y1) (x2, y2), (b, g, r), width
+    cv2.line(image, (0, 0), (150, 150), (255, 0, 0) , 15)
+
+    #image, (top left x1, y1), (bottom right x2, y2), (b, g, r), width
+    #-1 denotes a filled in object
+    cv2.rectangle(image, (15, 25), (200, 150), (0, 0, 255), 5)
+
+    #image, (center coords x, y), radius, (b, g, r), width
+    cv2.circle(image, (100, 63), 55, (0, 255, 0), -1)
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(image, 'Testing!', (0, 130), font, 0.7, (0, 255, 255), 1, cv2.LINE_AA)

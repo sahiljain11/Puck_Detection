@@ -17,9 +17,11 @@ if (args.get('read') != ""):
 else:
     vidcap = cv2.VideoCapture(args.get("stream"))
 
+vidcap = cv2.VideoCapture("playstationcam1_fixed.avi")
+
 if (args.get('write') != ""):
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
+    out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (640, 480))
 
 time.sleep(2.0)     # Helps in loading up video processing
 count = 0
@@ -33,7 +35,7 @@ blob_params.filterByInertia = False
 blob_params.filterByCircularity = False
 
 detector = cv2.SimpleBlobDetector_create(blob_params)
-lower_blue = np.array([100, 50, 50])
+lower_blue = np.array([100, 100, 100])
 upper_blue = np.array([120, 255, 255])
 
 def image_operations(image):
@@ -41,7 +43,7 @@ def image_operations(image):
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
 
     mask = cv2.inRange(hsv, lower_blue, upper_blue)  # actually gets the puck
-    mask = cv2.erode(mask, None, iterations=2)  # removes any excess blobs that may be detected
+    mask = cv2.erode(mask, None, iterations=3)  # removes any excess blobs that may be detected
     mask = cv2.dilate(mask, None, iterations=2)  # also removes any excess blobs that may be detected
 
     cv2.imshow("mask", mask)
@@ -90,7 +92,7 @@ while True:
 
         # cv2.imwrite("frame%d.jpg" % count, image)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(10) & 0xFF == ord('q'):
         if (args.get("debug") != ""):
             file.close()
         break

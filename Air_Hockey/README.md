@@ -32,5 +32,8 @@ To run the code, simply run the BlobDetection.py file in your terminal with the 
 ```
 python BlobDetection.py -s 0
 ```
+# Important Note
+Ensure that you have a proper visualization method via the terminal. Personally, I used a Windows Linux Subsystem and used XMING
+and simply exported the visualization parameters at the prior to running the code. I believe PyCharm does this automatically but I'm not sure if you can run argparse in PyCharm.
 
-Enjoy!
+Other than that, enjoy!
